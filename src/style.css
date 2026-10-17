@@ -1,3 +1,162 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
+  --bg: #14161b;
+  --panel: #1d2027;
+  --bar: #23262e;
+  --line: #343844;
+  --text: #e6e8ee;
+  --muted: #8b90a0;
+  --ok: #6cc28b;
+  --bad: #e06c6c;
+  --gold: #f2c94c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+header {
+  padding: 0.75rem max(1.25rem, env(safe-area-inset-right)) 0.75rem
+    max(1.25rem, env(safe-area-inset-left));
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+main p {
+  margin: 0;
+}
+
+.streak {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+#streak {
+  color: var(--text);
+  font-size: clamp(2.5rem, 12vw, 3.5rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+#bar {
+  position: relative;
+  width: min(100%, 45rem);
+  height: 3.5rem;
+  background: var(--bar);
+  border: 1px solid var(--line);
+  border-radius: 0.625rem;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+#zone {
+  position: absolute;
+  inset-block: 0;
+  background: rgb(108 194 139 / 0.35);
+  box-shadow:
+    inset 2px 0 var(--ok),
+    inset -2px 0 var(--ok);
+}
+
+/* the "perfect" core; --perfect-core is set from game.ts */
+#zone::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: calc(50% - var(--perfect-core) * 100%);
+  width: calc(var(--perfect-core) * 200%);
+  background: rgb(108 194 139 / 0.35);
+}
+
+/* full-width layer, so translateX(100%) moves the line across the whole bar */
+#needle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+#needle::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -2px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--text);
+  box-shadow: 0 0 8px rgb(255 255 255 / 0.6);
+}
+
+#result {
+  min-height: 1.5em;
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+[data-outcome="hit"] #bar {
+  box-shadow: 0 0 0 3px var(--ok);
+}
+[data-outcome="perfect"] #bar {
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 0 24px rgb(242 201 76 / 0.4);
+}
+[data-outcome="miss"] #bar {
+  box-shadow: 0 0 0 3px var(--bad);
+}
+
+[data-outcome="hit"] #result {
+  color: var(--ok);
+}
+[data-outcome="perfect"] #result {
+  color: var(--gold);
+}
+[data-outcome="miss"] #result {
+  color: var(--bad);
 }

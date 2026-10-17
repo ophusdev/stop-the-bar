@@ -2,11 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="A silly one-button timing game for short breaks." />
+    <meta name="theme-color" content="#14161b" />
     <title>Stop The Bar</title>
   </head>
   <body>
+    <header>
+      <h1>Stop The Bar</h1>
+    </header>
+    <main id="play">
+      <p class="streak"><span id="streak">0</span> streak</p>
+      <div id="bar">
+        <div id="zone"></div>
+        <div id="needle"></div>
+      </div>
+      <p id="result" aria-live="polite"></p>
+      <p class="hint">Tap, click or press <kbd>Space</kbd> when the needle is in the zone</p>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
