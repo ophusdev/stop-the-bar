@@ -1,5 +1,7 @@
 import "./style.css";
 import { needleAt, type Outcome, PERFECT_CORE, press, startRound } from "./game";
+import { accuracy, freshStats, record } from "./stats";
+import { load, openStore, save } from "./storage";
 
 const RESULT_PAUSE_MS = 700;
 
@@ -9,11 +11,14 @@ const LABELS: Record<Outcome, string> = {
   miss: "Miss",
 };
 
-function element(id: string): HTMLElement {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing #${id}`);
-  return el;
+const percent = new Intl.NumberFormat("en", { style: "percent" });
+
+function required<T>(value: T | null, what: string): T {
+  if (value === null) throw new Error(`Missing ${what}`);
+  return value;
 }
+
+const element = (id: string) => required(document.getElementById(id), `#${id}`);
 
 const ui = {
   play: element("play"),
@@ -21,9 +26,19 @@ const ui = {
   zone: element("zone"),
   needle: element("needle"),
   result: element("result"),
+  best: element("best"),
+  hits: element("hits"),
+  perfects: element("perfects"),
+  accuracy: element("accuracy"),
+  reset: element("reset"),
+  resetDialog: required(document.querySelector("dialog"), "dialog"),
+  confirmReset: element("confirm-reset"),
 };
 
-let round = startRound(0, 0, performance.now(), Math.random);
+const store = openStore();
+let data = load(store);
+let round = startRound(data.stats.streak, 0, performance.now(), Math.random);
+let nextRound = 0;
 
 function showRound() {
   ui.streak.textContent = String(round.streak);
@@ -34,25 +49,68 @@ function showRound() {
   document.title = `Streak ${round.streak} · Stop The Bar`;
 }
 
+function showStats() {
+  const { stats } = data;
+  const ratio = accuracy(stats);
+  ui.best.textContent = String(stats.best);
+  ui.hits.textContent = String(stats.hits);
+  ui.perfects.textContent = String(stats.perfects);
+  ui.accuracy.textContent = ratio === null ? "–" : percent.format(ratio);
+}
+
 function onPress(t: number) {
-  const next = press(round, t);
-  if (next === round) return;
-  round = next;
+  const judged = press(round, t);
+  if (!judged) return;
+  const previousBest = data.stats.best;
+  round = judged;
+  data = { ...data, stats: record(data.stats, judged.outcome, judged.streak) };
+  save(store, data);
   showRound();
-  setTimeout(() => {
+  showStats();
+  if (data.stats.best > previousBest) ui.result.textContent += " New best!";
+  nextRound = window.setTimeout(() => {
     round = startRound(round.streak, round.sweep.phase0, performance.now(), Math.random);
     showRound();
   }, RESULT_PAUSE_MS);
 }
 
+function resetStats() {
+  window.clearTimeout(nextRound);
+  data = { ...data, stats: freshStats() };
+  save(store, data);
+  round = startRound(0, round.sweep.phase0, performance.now(), Math.random);
+  showRound();
+  showStats();
+}
+
+// Space always plays: closing the dialog puts focus back on the Reset button,
+// and Space must not open it again. Enter is left to buttons, so they stay
+// usable from the keyboard.
+function isGameKey(e: KeyboardEvent) {
+  if (ui.resetDialog.open) return false;
+  if (e.code === "Space") return true;
+  return e.code === "Enter" && !(e.target instanceof HTMLButtonElement);
+}
+
+window.addEventListener("keydown", (e) => {
+  if (!isGameKey(e)) return;
+  e.preventDefault();
+  if (!e.repeat) onPress(e.timeStamp);
+});
+
+// buttons fire on keyup for Space
+window.addEventListener("keyup", (e) => {
+  if (isGameKey(e)) e.preventDefault();
+});
+
 ui.play.addEventListener("pointerdown", (e) => {
   if (e.button === 0) onPress(e.timeStamp);
 });
 
-window.addEventListener("keydown", (e) => {
-  if (e.code !== "Space" && e.code !== "Enter") return;
-  e.preventDefault();
-  if (!e.repeat) onPress(e.timeStamp);
+ui.reset.addEventListener("click", () => ui.resetDialog.showModal());
+
+ui.resetDialog.addEventListener("submit", (e) => {
+  if (e.submitter === ui.confirmReset) resetStats();
 });
 
 function frame(now: number) {
@@ -62,4 +120,5 @@ function frame(now: number) {
 
 document.documentElement.style.setProperty("--perfect-core", String(PERFECT_CORE));
 showRound();
+showStats();
 requestAnimationFrame(frame);

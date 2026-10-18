@@ -10,6 +10,7 @@
   <body>
     <header>
       <h1>Stop The Bar</h1>
+      <button type="button" id="reset">Reset stats</button>
     </header>
     <main id="play">
       <p class="streak"><span id="streak">0</span> streak</p>
@@ -19,7 +20,23 @@
       </div>
       <p id="result" aria-live="polite"></p>
       <p class="hint">Tap, click or press <kbd>Space</kbd> when the needle is in the zone</p>
+      <p class="stats">
+        <span>Best <b id="best">0</b></span>
+        <span>Hits <b id="hits">0</b></span>
+        <span>Perfects <b id="perfects">0</b></span>
+        <span>Accuracy <b id="accuracy">–</b></span>
+      </p>
     </main>
+    <dialog aria-labelledby="reset-title">
+      <form method="dialog">
+        <h2 id="reset-title">Reset stats?</h2>
+        <p>Best streak, hits and accuracy all go back to zero. There is no undo.</p>
+        <div class="actions">
+          <button type="submit" autofocus>Keep them</button>
+          <button type="submit" id="confirm-reset" class="danger">Reset</button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

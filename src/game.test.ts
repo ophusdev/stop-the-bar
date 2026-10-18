@@ -106,41 +106,40 @@ describe("press", () => {
     outcome: null,
   };
 
+  function pressAt(t: number) {
+    const judged = press(round, t);
+    if (!judged) throw new Error(`press at ${t} was ignored`);
+    return judged;
+  }
+
   it("extends the streak on a hit", () => {
-    const after = press(round, 900); // needle at 0.45
-    expect(after.outcome).toBe("hit");
-    expect(after.streak).toBe(4);
+    expect(press(round, 900)).toMatchObject({ outcome: "hit", streak: 4 }); // needle at 0.45
   });
 
   it("extends the streak on a perfect", () => {
-    const after = press(round, 1000); // needle at 0.5
-    expect(after.outcome).toBe("perfect");
-    expect(after.streak).toBe(4);
+    expect(press(round, 1000)).toMatchObject({ outcome: "perfect", streak: 4 }); // needle at 0.5
   });
 
   it("resets the streak on a miss", () => {
-    const after = press(round, 200); // needle at 0.1
-    expect(after.outcome).toBe("miss");
-    expect(after.streak).toBe(0);
+    expect(press(round, 200)).toMatchObject({ outcome: "miss", streak: 0 }); // needle at 0.1
   });
 
   it("freezes the needle where it was pressed", () => {
-    const after = press(round, 900);
-    expect(needleAt(after.sweep, 900)).toBeCloseTo(0.45);
-    expect(needleAt(after.sweep, 5000)).toBeCloseTo(0.45);
+    const { sweep } = pressAt(900);
+    expect(needleAt(sweep, 900)).toBeCloseTo(0.45);
+    expect(needleAt(sweep, 5000)).toBeCloseTo(0.45);
   });
 
   it("ignores a second press while the result is showing", () => {
-    const after = press(round, 900);
-    expect(press(after, 950)).toBe(after);
+    expect(press(pressAt(900), 950)).toBeNull();
   });
 
   it("ignores a press queued before the round started", () => {
-    expect(press(round, -1)).toBe(round);
+    expect(press(round, -1)).toBeNull();
   });
 
   it("lets the next round continue from where the needle stopped", () => {
-    const stopped = press(round, 900);
+    const stopped = pressAt(900);
     const next = startRound(stopped.streak, stopped.sweep.phase0, 2000, Math.random);
     expect(needleAt(next.sweep, 2000)).toBeCloseTo(0.45);
   });

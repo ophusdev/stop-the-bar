@@ -60,10 +60,12 @@ export function startRound(streak: number, phase0: number, t: number, random: ()
   };
 }
 
-// Returns the same round when the press doesn't count: the result is already
-// showing, or the event was queued before this round started.
-export function press(round: Round, t: number): Round {
-  if (round.outcome !== null || t < round.sweep.t0) return round;
+export type JudgedRound = Round & { outcome: Outcome };
+
+// Returns null when the press doesn't count: the result is already showing,
+// or the event was queued before this round started.
+export function press(round: Round, t: number): JudgedRound | null {
+  if (round.outcome !== null || t < round.sweep.t0) return null;
   const outcome = judge(needleAt(round.sweep, t), round.zone);
   return {
     ...round,
