@@ -1,14 +1,15 @@
 :root {
-  color-scheme: dark;
-  --bg: #14161b;
-  --panel: #1d2027;
-  --bar: #23262e;
-  --line: #343844;
-  --text: #e6e8ee;
-  --muted: #8b90a0;
-  --ok: #6cc28b;
-  --bad: #e06c6c;
-  --gold: #f2c94c;
+  color-scheme: light dark;
+  --bg: light-dark(#f4f5f7, #14161b);
+  --panel: light-dark(#ffffff, #1d2027);
+  --bar: light-dark(#e4e7ec, #23262e);
+  --line: light-dark(#cfd3db, #343844);
+  --text: light-dark(#1b1e24, #e6e8ee);
+  --muted: light-dark(#5a606d, #8b90a0);
+  --ok: light-dark(#23864a, #6cc28b);
+  --bad: light-dark(#c23b3b, #e06c6c);
+  --gold: light-dark(#946a00, #f2c94c);
+  --glow: light-dark(rgb(0 0 0 / 0.25), rgb(255 255 255 / 0.6));
 }
 
 * {
@@ -66,6 +67,16 @@ button:hover {
   color: var(--text);
 }
 
+button:focus-visible {
+  outline: 2px solid var(--ok);
+  outline-offset: 2px;
+}
+
+button[aria-pressed="true"] {
+  background: var(--bar);
+  color: var(--text);
+}
+
 button.danger {
   border-color: var(--bad);
   background: var(--bad);
@@ -116,10 +127,15 @@ main p {
   transition: box-shadow 0.15s;
 }
 
+/* hatched as well as green, so the zone doesn't depend on telling colors apart */
 #zone {
   position: absolute;
   inset-block: 0;
-  background: rgb(108 194 139 / 0.35);
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--ok) 40%, transparent) 0 6px,
+    color-mix(in srgb, var(--ok) 22%, transparent) 6px 12px
+  );
   box-shadow:
     inset 2px 0 var(--ok),
     inset -2px 0 var(--ok);
@@ -132,7 +148,7 @@ main p {
   inset-block: 0;
   left: calc(50% - var(--perfect-core) * 100%);
   width: calc(var(--perfect-core) * 200%);
-  background: rgb(108 194 139 / 0.35);
+  background: color-mix(in srgb, var(--ok) 45%, transparent);
 }
 
 /* full-width layer, so translateX(100%) moves the line across the whole bar */
@@ -151,7 +167,15 @@ main p {
   width: 4px;
   border-radius: 2px;
   background: var(--text);
-  box-shadow: 0 0 8px rgb(255 255 255 / 0.6);
+  box-shadow: 0 0 8px var(--glow);
+}
+
+#feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
 }
 
 #result {
@@ -160,10 +184,36 @@ main p {
   font-weight: 700;
 }
 
+#quip {
+  min-height: 1.5em;
+  color: var(--muted);
+}
+
 .hint {
   color: var(--muted);
   font-size: 0.8125rem;
   text-align: center;
+}
+
+.hint-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .hint-touch {
+    display: inline;
+  }
+  .hint-desktop {
+    display: none;
+  }
+}
+
+kbd {
+  padding: 0.0625rem 0.375rem;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 0.25rem;
+  font: inherit;
 }
 
 .stats {
@@ -187,6 +237,11 @@ dialog {
   border-radius: 0.625rem;
   background: var(--panel);
   color: var(--text);
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 dialog::backdrop {
@@ -230,4 +285,10 @@ dialog p {
 }
 [data-outcome="miss"] #result {
   color: var(--bad);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #bar {
+    transition: none;
+  }
 }

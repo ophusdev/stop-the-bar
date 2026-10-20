@@ -4,13 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="A silly one-button timing game for short breaks." />
-    <meta name="theme-color" content="#14161b" />
+    <meta name="theme-color" content="#14161b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
     <title>Stop The Bar</title>
   </head>
   <body>
     <header>
       <h1>Stop The Bar</h1>
-      <button type="button" id="reset">Reset stats</button>
+      <div class="header-actions">
+        <button type="button" id="mute" aria-pressed="false">Mute</button>
+        <button type="button" id="reset">Reset stats</button>
+      </div>
     </header>
     <main id="play">
       <p class="streak"><span id="streak">0</span> streak</p>
@@ -18,8 +22,15 @@
         <div id="zone"></div>
         <div id="needle"></div>
       </div>
-      <p id="result" aria-live="polite"></p>
-      <p class="hint">Tap, click or press <kbd>Space</kbd> when the needle is in the zone</p>
+      <div id="feedback" aria-live="polite">
+        <p id="result"></p>
+        <p id="quip"></p>
+      </div>
+      <p class="hint">
+        <span class="hint-touch">Tap</span>
+        <span class="hint-desktop">Click or press <kbd>Space</kbd></span>
+        when the needle is in the zone
+      </p>
       <p class="stats">
         <span>Best <b id="best">0</b></span>
         <span>Hits <b id="hits">0</b></span>
