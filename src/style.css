@@ -95,6 +95,8 @@ main {
     max(1rem, env(safe-area-inset-left));
   cursor: pointer;
   touch-action: manipulation;
+  /* the whole area is the tap target; the bar's glow is the feedback */
+  -webkit-tap-highlight-color: transparent;
 }
 
 main p {
