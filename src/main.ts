@@ -35,6 +35,7 @@ const ui = {
   perfects: element("perfects"),
   accuracy: element("accuracy"),
   mute: element("mute"),
+  muteLabel: element("mute-label"),
   reset: element("reset"),
   resetDialog: required(document.querySelector("dialog"), "dialog"),
   confirmReset: element("confirm-reset"),
@@ -65,7 +66,9 @@ function showStats() {
 }
 
 function showSettings() {
-  ui.mute.ariaPressed = String(data.settings.muted);
+  const { muted } = data.settings;
+  ui.mute.dataset.muted = String(muted);
+  ui.muteLabel.textContent = muted ? "Sound off" : "Sound on";
 }
 
 function onPress(t: number) {
