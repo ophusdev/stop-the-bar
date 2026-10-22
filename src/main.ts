@@ -1,4 +1,3 @@
-import "./style.css";
 import { needleAt, type Outcome, PERFECT_CORE, press, startRound } from "./game";
 import { quip } from "./quips";
 import { playSound } from "./sound";
