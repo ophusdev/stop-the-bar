@@ -161,4 +161,5 @@ document.documentElement.style.setProperty("--perfect-core", String(PERFECT_CORE
 showRound();
 showStats();
 showSettings();
+document.documentElement.dataset.ready = "";
 requestAnimationFrame(frame);

@@ -16,6 +16,11 @@
   box-sizing: border-box;
 }
 
+/* values read from the save stay hidden until main.ts has filled them in */
+html:not([data-ready]) :is(#streak, .stats, #mute) {
+  visibility: hidden;
+}
+
 html,
 body {
   margin: 0;
