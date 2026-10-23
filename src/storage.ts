@@ -1,7 +1,11 @@
 import { freshStats, type Stats } from "./stats";
 
+export const THEMES = ["system", "light", "dark"] as const;
+export type Theme = (typeof THEMES)[number];
+
 export interface Settings {
   muted: boolean;
+  theme: Theme;
 }
 
 export interface SaveData {
@@ -11,6 +15,7 @@ export interface SaveData {
 
 export type Store = Pick<Storage, "getItem" | "setItem">;
 
+// public/theme.js reads this key too, before the page is first painted
 const KEY = "stop-the-bar/v1";
 
 // Reading window.localStorage throws when the browser blocks site data.
@@ -53,7 +58,11 @@ function readStats(raw: unknown): Stats {
 }
 
 function readSettings(raw: unknown): Settings {
-  return { muted: isRecord(raw) && typeof raw.muted === "boolean" ? raw.muted : false };
+  const settings: Settings = { muted: false, theme: "system" };
+  if (!isRecord(raw)) return settings;
+  if (typeof raw.muted === "boolean") settings.muted = raw.muted;
+  settings.theme = THEMES.find((theme) => theme === raw.theme) ?? settings.theme;
+  return settings;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>

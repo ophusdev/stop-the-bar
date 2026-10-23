@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { freshStats } from "./stats";
 import { load, type SaveData, type Store, save } from "./storage";
 
-const defaults: SaveData = { stats: freshStats(), settings: { muted: false } };
+const defaults: SaveData = { stats: freshStats(), settings: { muted: false, theme: "system" } };
 
 function memoryStore(): Store {
   const items = new Map<string, string>();
@@ -32,7 +32,7 @@ describe("load", () => {
     const store = memoryStore();
     const data: SaveData = {
       stats: { best: 12, streak: 3, attempts: 40, hits: 30, perfects: 4 },
-      settings: { muted: true },
+      settings: { muted: true, theme: "dark" },
     };
     save(store, data);
     expect(load(store)).toEqual(data);
@@ -50,12 +50,17 @@ describe("load", () => {
   it("keeps the valid fields and drops the rest", () => {
     const raw = JSON.stringify({
       stats: { best: 7, streak: -1, attempts: 2.5, hits: "3", perfects: 1 },
-      settings: { muted: "yes" },
+      settings: { muted: "yes", theme: "sepia" },
     });
     expect(load(storeHolding(raw))).toEqual({
       stats: { ...freshStats(), best: 7, perfects: 1 },
-      settings: { muted: false },
+      settings: { muted: false, theme: "system" },
     });
+  });
+
+  it("reads a save from before the theme setting existed", () => {
+    const raw = JSON.stringify({ stats: freshStats(), settings: { muted: true } });
+    expect(load(storeHolding(raw)).settings).toEqual({ muted: true, theme: "system" });
   });
 
   it("starts fresh when storage can't be read", () => {

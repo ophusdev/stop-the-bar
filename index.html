@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#14161b" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
     <title>Stop The Bar</title>
+    <script src="/theme.js"></script>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
@@ -20,6 +21,14 @@
             <path class="slash" d="M16 9l6 6M22 9l-6 6" />
           </svg>
           <span id="mute-label">Sound on</span>
+        </button>
+        <button type="button" id="theme">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8" />
+            <path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" />
+          </svg>
+          <span class="visually-hidden">Theme:</span>
+          <span id="theme-label">Auto</span>
         </button>
         <button type="button" id="reset">Reset stats</button>
       </div>

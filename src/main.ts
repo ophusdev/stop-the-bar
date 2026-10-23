@@ -2,7 +2,7 @@ import { needleAt, type Outcome, PERFECT_CORE, press, startRound } from "./game"
 import { quip } from "./quips";
 import { playSound } from "./sound";
 import { accuracy, freshStats, record } from "./stats";
-import { load, openStore, save } from "./storage";
+import { load, openStore, save, THEMES, type Theme } from "./storage";
 
 const RESULT_PAUSE_MS = 700;
 const FOCUS_GUARD_MS = 300;
@@ -11,6 +11,12 @@ const LABELS: Record<Outcome, string> = {
   perfect: "Perfect!",
   hit: "Hit!",
   miss: "Miss",
+};
+
+const THEME_LABELS: Record<Theme, string> = {
+  system: "Auto",
+  light: "Light",
+  dark: "Dark",
 };
 
 const percent = new Intl.NumberFormat("en", { style: "percent" });
@@ -35,10 +41,19 @@ const ui = {
   accuracy: element("accuracy"),
   mute: element("mute"),
   muteLabel: element("mute-label"),
+  theme: element("theme"),
+  themeLabel: element("theme-label"),
   reset: element("reset"),
   resetDialog: required(document.querySelector("dialog"), "dialog"),
   confirmReset: element("confirm-reset"),
 };
+
+// The browser's own UI (Android's address bar) follows these, and they only
+// know about the system theme.
+const themeColorMetas = [...document.getElementsByTagName("meta")].filter(
+  (meta) => meta.name === "theme-color",
+);
+const systemThemeColors = themeColorMetas.map((meta) => meta.content);
 
 const store = openStore();
 let data = load(store);
@@ -65,9 +80,18 @@ function showStats() {
 }
 
 function showSettings() {
-  const { muted } = data.settings;
+  const { muted, theme } = data.settings;
   ui.mute.dataset.muted = String(muted);
   ui.muteLabel.textContent = muted ? "Sound off" : "Sound on";
+  ui.themeLabel.textContent = THEME_LABELS[theme];
+
+  const root = document.documentElement;
+  if (theme === "system") delete root.dataset.theme;
+  else root.dataset.theme = theme;
+  const forced = theme === "system" ? null : getComputedStyle(document.body).backgroundColor;
+  themeColorMetas.forEach((meta, i) => {
+    meta.content = forced ?? systemThemeColors[i] ?? meta.content;
+  });
 }
 
 function onPress(t: number) {
@@ -142,6 +166,14 @@ ui.play.addEventListener("pointerdown", (e) => {
 
 ui.mute.addEventListener("click", () => {
   data = { ...data, settings: { ...data.settings, muted: !data.settings.muted } };
+  save(store, data);
+  showSettings();
+});
+
+ui.theme.addEventListener("click", () => {
+  const { theme } = data.settings;
+  const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length] ?? "system";
+  data = { ...data, settings: { ...data.settings, theme: next } };
   save(store, data);
   showSettings();
 });
