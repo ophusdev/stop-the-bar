@@ -1,6 +1,6 @@
 {
   "name": "stop-the-bar",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A silly one-button timing game for short breaks.",
   "private": true,
   "license": "MIT",
