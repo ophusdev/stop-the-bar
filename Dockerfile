@@ -2,7 +2,7 @@
 
 # The build output is plain static files, so this stage runs once on the
 # build machine's own platform; only the nginx stage is built per target.
-FROM --platform=$BUILDPLATFORM node:24.22.2-alpine AS build
+FROM --platform=$BUILDPLATFORM node:26.12.1-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
